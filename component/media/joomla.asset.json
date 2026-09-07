@@ -15,6 +15,13 @@
       "type": "script",
       "uri": "com_decaroeditor/js/editor.js",
       "attributes": {"defer": true}
+    },
+    {
+      "name": "com_decaroeditor.field",
+      "type": "script",
+      "uri": "com_decaroeditor/js/field-bridge.js",
+      "dependencies": ["com_decaroeditor.editor"],
+      "attributes": {"defer": true}
     }
   ]
 }
