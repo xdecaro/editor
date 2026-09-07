@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="editors" method="upgrade">
+    <name>PLG_EDITORS_DECAROEDITOR</name>
+    <author>Luca De Caro</author>
+    <creationDate>2026-09</creationDate>
+    <copyright>(C) 2026 Luca De Caro</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <version>0.1.0-alpha1</version>
+    <description>PLG_EDITORS_DECAROEDITOR_XML_DESCRIPTION</description>
+    <namespace path="src">Xdecaro\Plugin\Editors\Decaroeditor</namespace>
+    <files>
+        <folder plugin="decaroeditor">services</folder>
+        <folder>src</folder>
+        <folder>language</folder>
+    </files>
+</extension>

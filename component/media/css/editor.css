@@ -1,0 +1,202 @@
+:root {
+  --xde-panel-bg: var(--template-bg-light, #fff);
+  --xde-border: color-mix(in srgb, currentColor 14%, transparent);
+  --xde-muted: color-mix(in srgb, currentColor 64%, transparent);
+  --xde-soft: color-mix(in srgb, currentColor 5%, transparent);
+  --xde-primary: var(--template-link-color, #0d6efd);
+  --xde-radius: 12px;
+}
+
+.xde-editor-shell {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(240px, 300px);
+  min-height: calc(100vh - 210px);
+  border: 1px solid var(--xde-border);
+  border-radius: var(--xde-radius);
+  background: var(--xde-panel-bg);
+  overflow: hidden;
+}
+
+.xde-editor-sidebar {
+  min-width: 0;
+  padding: 18px;
+  background: var(--xde-panel-bg);
+}
+
+.xde-editor-sidebar--blocks { border-inline-end: 1px solid var(--xde-border); }
+.xde-editor-sidebar--properties { border-inline-start: 1px solid var(--xde-border); }
+
+.xde-editor-panel-heading,
+.xde-editor-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.xde-icon-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 34px;
+  border: 1px solid var(--xde-border);
+  border-radius: 8px;
+  background: var(--xde-panel-bg);
+  color: inherit;
+}
+
+.xde-block-search { margin-bottom: 12px; }
+.xde-block-list { display: grid; gap: 4px; }
+.xde-block-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+}
+.xde-block-button:hover,
+.xde-block-button:focus-visible { background: var(--xde-soft); outline: 2px solid transparent; }
+.xde-block-icon { width: 24px; text-align: center; font-weight: 700; }
+.xde-sidebar-hint { margin-top: 14px; font-size: .82rem; color: var(--xde-muted); }
+
+.xde-editor-workspace {
+  position: relative;
+  min-width: 0;
+  padding: clamp(24px, 4vw, 54px);
+  background: var(--xde-panel-bg);
+}
+
+.xde-save-state { color: #16803c; font-size: .9rem; }
+.xde-history-actions { display: flex; gap: 6px; }
+
+.xde-document-title {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 750;
+  line-height: 1.08;
+}
+.xde-document-lead { margin: 8px 0 22px; color: var(--xde-muted); }
+
+.xde-editor-canvas {
+  min-height: 360px;
+  padding: 8px 0 80px;
+  outline: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.xde-editor-canvas [data-xde-block] {
+  position: relative;
+  margin-block: 14px;
+  border-radius: 8px;
+}
+.xde-editor-canvas [data-xde-block].is-selected { outline: 2px solid var(--xde-primary); outline-offset: 4px; }
+.xde-editor-canvas figure { margin-inline: 0; }
+.xde-editor-canvas img { display: block; max-width: 100%; height: auto; border-radius: 10px; }
+.xde-editor-canvas figcaption { margin-top: 6px; font-size: .9rem; color: var(--xde-muted); }
+.xde-video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: #111; }
+.xde-video-frame iframe,
+.xde-video-frame video { width: 100%; height: 100%; border: 0; }
+.xde-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border: 1px dashed var(--xde-border);
+  border-radius: 10px;
+  background: var(--xde-soft);
+  color: var(--xde-muted);
+}
+.xde-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.xde-column { min-height: 90px; padding: 12px; border: 1px dashed var(--xde-border); border-radius: 8px; }
+
+.xde-add-content {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1px dashed var(--xde-border);
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+}
+
+.xde-inline-toolbar {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--xde-border);
+  border-radius: 9px;
+  background: var(--xde-panel-bg);
+  box-shadow: 0 8px 28px rgba(0,0,0,.12);
+}
+.xde-inline-toolbar button { min-width: 34px; min-height: 32px; border: 0; border-radius: 6px; background: transparent; color: inherit; }
+.xde-inline-toolbar button:hover { background: var(--xde-soft); }
+
+.xde-slash-menu {
+  position: absolute;
+  z-index: 30;
+  width: min(320px, calc(100% - 32px));
+  padding: 10px;
+  border: 1px solid var(--xde-border);
+  border-radius: 10px;
+  background: var(--xde-panel-bg);
+  box-shadow: 0 14px 40px rgba(0,0,0,.16);
+}
+.xde-slash-menu .xde-block-button { padding: 8px; }
+
+.xde-properties-empty { color: var(--xde-muted); font-size: .92rem; }
+.xde-property { margin-bottom: 14px; }
+.xde-property label { display: block; margin-bottom: 5px; font-weight: 600; }
+.xde-property .form-control,
+.xde-property .form-select { width: 100%; }
+.xde-property-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.xde-editor-shell.is-blocks-collapsed { grid-template-columns: 0 minmax(0, 1fr) minmax(240px, 300px); }
+.xde-editor-shell.is-properties-collapsed { grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) 0; }
+.xde-editor-shell.is-blocks-collapsed .xde-editor-sidebar--blocks,
+.xde-editor-shell.is-properties-collapsed .xde-editor-sidebar--properties { padding: 0; overflow: hidden; border: 0; }
+
+@media (max-width: 1100px) {
+  .xde-editor-shell { grid-template-columns: 210px minmax(0, 1fr); }
+  .xde-editor-sidebar--properties {
+    position: fixed;
+    z-index: 1050;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(360px, 92vw);
+    transform: translateX(100%);
+    transition: transform .2s ease;
+    box-shadow: -12px 0 32px rgba(0,0,0,.18);
+  }
+  .xde-editor-sidebar--properties.is-open { transform: translateX(0); }
+  .xde-editor-shell.is-properties-collapsed { grid-template-columns: 210px minmax(0, 1fr); }
+  .xde-mobile-property-bar { position: fixed; z-index: 1040; inset-inline: 16px; bottom: 16px; text-align: center; }
+}
+
+@media (max-width: 720px) {
+  .xde-editor-shell { display: block; min-height: 0; overflow: visible; }
+  .xde-editor-sidebar--blocks {
+    position: fixed;
+    z-index: 1050;
+    inset: 0 auto 0 0;
+    width: min(330px, 90vw);
+    transform: translateX(-100%);
+    transition: transform .2s ease;
+    box-shadow: 12px 0 32px rgba(0,0,0,.18);
+  }
+  .xde-editor-sidebar--blocks.is-open { transform: translateX(0); }
+  .xde-editor-workspace { padding: 22px 18px 84px; }
+  .xde-document-title { font-size: 2rem; }
+  .xde-columns { grid-template-columns: 1fr; }
+}

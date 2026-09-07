@@ -1,0 +1,32 @@
+name: Build Joomla packages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build packages
+        run: |
+          chmod +x tools/build.sh
+          tools/build.sh 0.1.0-alpha1
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: decaroeditor-0.1.0-alpha1
+          path: |
+            dist/com_decaroeditor_0.1.0-alpha1.zip
+            dist/plg_editors_decaroeditor_0.1.0-alpha1.zip
+            dist/pkg_decaroeditor_0.1.0-alpha1.zip

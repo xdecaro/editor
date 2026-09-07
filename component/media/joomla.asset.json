@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_decaroeditor",
+  "version": "0.1.0-alpha1",
+  "description": "Editor by xdecaro assets",
+  "license": "GPL-2.0-or-later",
+  "assets": [
+    {
+      "name": "com_decaroeditor.editor",
+      "type": "style",
+      "uri": "com_decaroeditor/css/editor.css"
+    },
+    {
+      "name": "com_decaroeditor.editor",
+      "type": "script",
+      "uri": "com_decaroeditor/js/editor.js",
+      "attributes": {"defer": true}
+    }
+  ]
+}

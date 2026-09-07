@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+    <name>COM_DECAROEDITOR</name>
+    <author>Luca De Caro</author>
+    <creationDate>2026-09</creationDate>
+    <copyright>(C) 2026 Luca De Caro</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <authorEmail></authorEmail>
+    <version>0.1.0-alpha1</version>
+    <description>COM_DECAROEDITOR_XML_DESCRIPTION</description>
+    <namespace path="src">Xdecaro\Component\Decaroeditor</namespace>
+
+    <administration>
+        <menu link="option=com_decaroeditor&amp;view=editor">COM_DECAROEDITOR</menu>
+        <files folder="admin">
+            <folder>services</folder>
+            <folder>src</folder>
+            <folder>tmpl</folder>
+            <folder>language</folder>
+        </files>
+    </administration>
+
+    <media destination="com_decaroeditor" folder="media">
+        <filename>joomla.asset.json</filename>
+        <folder>css</folder>
+        <folder>js</folder>
+    </media>
+
+    <updateservers>
+        <server type="extension" priority="1" name="Editor by xdecaro">https://raw.githubusercontent.com/xdecaro/editor/main/updates/com_decaroeditor.xml</server>
+    </updateservers>
+</extension>

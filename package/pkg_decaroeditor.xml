@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="package" method="upgrade">
+    <name>PKG_DECAROEDITOR</name>
+    <packagename>decaroeditor</packagename>
+    <author>Luca De Caro</author>
+    <creationDate>2026-09</creationDate>
+    <copyright>(C) 2026 Luca De Caro</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <version>0.1.0-alpha1</version>
+    <description>PKG_DECAROEDITOR_XML_DESCRIPTION</description>
+    <files>
+        <file type="component" id="com_decaroeditor">com_decaroeditor_0.1.0-alpha1.zip</file>
+        <file type="plugin" id="decaroeditor" group="editors">plg_editors_decaroeditor_0.1.0-alpha1.zip</file>
+    </files>
+    <updateservers>
+        <server type="extension" priority="1" name="Editor by xdecaro package">https://raw.githubusercontent.com/xdecaro/editor/main/updates/pkg_decaroeditor.xml</server>
+    </updateservers>
+</extension>
