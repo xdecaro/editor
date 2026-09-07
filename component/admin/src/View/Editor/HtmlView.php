@@ -23,9 +23,6 @@ final class HtmlView extends BaseHtmlView
         $wa->useScript('com_decaroeditor.editor');
 
         ToolbarHelper::title(Text::_('COM_DECAROEDITOR'), 'edit');
-        ToolbarHelper::custom('editor.preview', 'eye', 'eye', 'COM_DECAROEDITOR_PREVIEW', false);
-        ToolbarHelper::custom('editor.save', 'save', 'save', 'JSAVE', false);
-        ToolbarHelper::custom('editor.saveclose', 'save', 'save', 'JSAVEANDCLOSE', false);
 
         parent::display($tpl);
     }
