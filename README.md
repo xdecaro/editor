@@ -10,14 +10,37 @@ The editor must remain fast, visual, accessible and easy to use without requirin
 
 ## Current development version
 
-**1.0.0-dev**
+**0.1.0-alpha1**
 
-## Planned package
+Version `1.0.0` is reserved for the first stable release after installation, Joomla editor integration, media handling, accessibility and responsive regression checks are complete.
+
+## Package
 
 - Joomla component: `com_decaroeditor`
 - Joomla package: `pkg_decaroeditor`
 - Joomla editor plugin: `plg_editors_decaroeditor`
 - Repository: `xdecaro/editor`
+
+## Current alpha implementation
+
+The repository now contains the first installable architecture for the project:
+
+- Joomla 6 administrator component scaffold;
+- reusable shared editor CSS/JavaScript assets;
+- Joomla `editors` plugin scaffold that keeps the original textarea as the canonical form value;
+- visual three-area editing interface;
+- initial block insertion;
+- slash-menu insertion;
+- contextual block properties;
+- undo/redo history in the active editing session;
+- intelligent paste cleaning;
+- YouTube, Vimeo and direct MP4 URL recognition;
+- initial responsive behavior for desktop, tablet and smartphone;
+- Joomla light/dark adaptive styling;
+- package manifest and GitHub update-server definitions;
+- build script and GitHub Actions package build.
+
+The alpha is a development baseline, not the final production release. Media Manager integration, real non-destructive crop derivatives, persistent revision history and final security/accessibility regression testing remain release milestones.
 
 ## Core interface
 
@@ -63,9 +86,9 @@ Content pasted from Word, Google Docs, websites or email should preserve useful 
 
 ## Editing experience
 
-- autosave with visible state;
+- autosave status;
 - undo and redo;
-- version history;
+- version-history architecture;
 - responsive preview for desktop, tablet and smartphone;
 - contextual formatting toolbar;
 - slash commands;
