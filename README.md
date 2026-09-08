@@ -10,7 +10,7 @@ The editor must remain fast, visual, accessible and easy to use without requirin
 
 ## Current development version
 
-**0.1.0-alpha2**
+**0.1.0-alpha3**
 
 Version `1.0.0` is reserved for the first stable release after installation, Joomla editor integration, media handling, accessibility and responsive regression checks are complete.
 
@@ -37,8 +37,9 @@ The repository now contains the first installable architecture for the project:
 - YouTube, Vimeo and direct MP4 URL recognition;
 - initial responsive behavior for desktop, tablet and smartphone;
 - Joomla light/dark adaptive styling;
+- optional Core by xdecaro 1.1+ design-token foundation with local fallback;
 - package manifest and GitHub update-server definitions;
-- build script and GitHub Actions package build.
+- deterministic build script, SHA-256 checksums and GitHub Actions package build/release workflows.
 
 The alpha is a development baseline, not the final production release. Media Manager integration, real non-destructive crop derivatives, persistent revision history and final security/accessibility regression testing remain release milestones.
 
@@ -109,7 +110,9 @@ All interface strings use Joomla language files. The technical default language 
 
 Editor supports the Xdecaro Core `1.0.0+` public reference contract through an optional runtime adapter. Other components can identify the entity being edited without exposing private tables or duplicating integration rules.
 
-Editor continues to work without Core; only features that explicitly require cross-product references are unavailable and fail with a controlled administrator-facing error. The editor engine remains in Editor and is never moved into Core.
+When Core `1.1.0+` is available, Editor also opts into the shared Core design-token foundation through `AssetService::useFoundation()` and `.xdecaro-scope`. Editor CSS maps only common colors, surfaces, borders, radii and shadows to Core. Canvas, blocks, media behavior, history, responsive editing and JavaScript remain specific to Editor.
+
+Editor continues to work without Core, with Core `1.0.x`, or when Core assets cannot be registered: local Editor token fallbacks remain active. Only features that explicitly require cross-product references are unavailable and fail with a controlled administrator-facing error.
 
 See `docs/core-integration.md` for the integration boundary and service API.
 
