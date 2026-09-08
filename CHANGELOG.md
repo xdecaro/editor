@@ -2,6 +2,15 @@
 
 All notable changes to Editor by xdecaro are documented here.
 
+## 0.1.0-alpha4 — 2026-09-09
+
+- Migrated optional Core consumption to the canonical `xdecaro\Core` namespace introduced by Core 1.3.0.
+- Raised both the public reference and shared UI integration minimum to Core 1.3.0.
+- Preserved Editor standalone behavior and local design-token fallbacks when Core is absent or incompatible.
+- Added a regression smoke guard that rejects runtime use of the deprecated `Xdecaro\Core` namespace.
+- Preserved `com_decaroeditor`, `pkg_decaroeditor`, `plg_editors_decaroeditor` and all Editor namespaces.
+- No editor-engine, block, media, history or content-format behavior changed.
+
 ## 0.1.0-alpha3 — 2026-09-08
 
 - Added optional Core by xdecaro `1.1.0+` design-token foundation loading.

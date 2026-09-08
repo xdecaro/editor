@@ -25,11 +25,16 @@ $controlledFailure = false;
 try {
     $service->createContextReference('com_content', 'article', 1);
 } catch (RuntimeException $exception) {
-    $controlledFailure = str_contains($exception->getMessage(), 'Xdecaro Core 1.0.0');
+    $controlledFailure = str_contains($exception->getMessage(), 'Core by xdecaro 1.3.0');
 }
 
 if (!$controlledFailure) {
     throw new RuntimeException('Editor must fail gracefully when optional Core is unavailable.');
 }
 
-echo "Editor optional Core integration smoke test passed.\n";
+$source = file_get_contents(__DIR__ . '/../component/admin/src/Service/CoreIntegrationService.php');
+if ($source === false || !str_contains($source, 'xdecaro\\Core') || str_contains($source, 'Xdecaro\\Core')) {
+    throw new RuntimeException('Editor must consume only the canonical xdecaro\\Core namespace.');
+}
+
+echo "Editor optional Core 1.3 integration smoke test passed.\n";

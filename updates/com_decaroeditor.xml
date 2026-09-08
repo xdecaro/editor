@@ -5,11 +5,11 @@
         <description>Modern visual block editor for Joomla.</description>
         <element>com_decaroeditor</element>
         <type>component</type>
-        <version>0.1.0-alpha3</version>
+        <version>0.1.0-alpha4</version>
         <downloads>
-            <downloadurl type="full" format="zip">https://github.com/xdecaro/editor/releases/download/v0.1.0-alpha3/com_decaroeditor_0.1.0-alpha3.zip</downloadurl>
+            <downloadurl type="full" format="zip">https://github.com/xdecaro/editor/releases/download/v0.1.0-alpha4/com_decaroeditor_0.1.0-alpha4.zip</downloadurl>
         </downloads>
-        <sha256>a7bc75dae7add7f49fa9887e9b90f8070fef5dfb9e1f31ba942e9ef0e41b88a5</sha256>
+        <sha256>0000000000000000000000000000000000000000000000000000000000000000</sha256>
         <targetplatform name="joomla" version="6.*" />
         <php_minimum>8.3</php_minimum>
     </update>

@@ -11,26 +11,25 @@ defined('_JEXEC') or die;
 use Joomla\CMS\WebAsset\WebAssetManager;
 
 /**
- * Safe optional boundary between Editor and Xdecaro Core.
+ * Safe optional boundary between Editor and Core by xdecaro.
  *
- * The public reference contract remains compatible with Core 1.0.0+, while
- * shared UI assets are consumed only when Core 1.1.0+ is available. Editor
- * remains fully usable with its local fallback when Core is absent.
+ * Core remains optional. Canonical Core APIs are consumed only when Core
+ * 1.3.0+ is available; otherwise Editor keeps its local fallback behavior.
  */
 final class CoreIntegrationService
 {
     /** @deprecated Use REFERENCE_MINIMUM_VERSION for new code. */
-    public const MINIMUM_VERSION = '1.0.0';
-    public const REFERENCE_MINIMUM_VERSION = '1.0.0';
-    public const UI_MINIMUM_VERSION = '1.1.0';
+    public const MINIMUM_VERSION = '1.3.0';
+    public const REFERENCE_MINIMUM_VERSION = '1.3.0';
+    public const UI_MINIMUM_VERSION = '1.3.0';
 
     public function isAvailable(): bool
     {
-        return class_exists(\Xdecaro\Core\Version::class)
-            && class_exists(\Xdecaro\Core\Integration\EntityReference::class)
-            && class_exists(\Xdecaro\Core\Integration\RelationReference::class)
+        return class_exists(\xdecaro\Core\Version::class)
+            && class_exists(\xdecaro\Core\Integration\EntityReference::class)
+            && class_exists(\xdecaro\Core\Integration\RelationReference::class)
             && version_compare(
-                \Xdecaro\Core\Version::VERSION,
+                (string) \xdecaro\Core\Version::VERSION,
                 self::REFERENCE_MINIMUM_VERSION,
                 '>='
             );
@@ -38,10 +37,10 @@ final class CoreIntegrationService
 
     public function isUiAvailable(): bool
     {
-        return class_exists(\Xdecaro\Core\Version::class)
-            && class_exists(\Xdecaro\Core\Asset\AssetService::class)
+        return class_exists(\xdecaro\Core\Version::class)
+            && class_exists(\xdecaro\Core\Asset\AssetService::class)
             && version_compare(
-                \Xdecaro\Core\Version::VERSION,
+                (string) \xdecaro\Core\Version::VERSION,
                 self::UI_MINIMUM_VERSION,
                 '>='
             );
@@ -49,11 +48,11 @@ final class CoreIntegrationService
 
     public function getInstalledVersion(): ?string
     {
-        if (!class_exists(\Xdecaro\Core\Version::class)) {
+        if (!class_exists(\xdecaro\Core\Version::class)) {
             return null;
         }
 
-        return \Xdecaro\Core\Version::VERSION;
+        return (string) \xdecaro\Core\Version::VERSION;
     }
 
     /**
@@ -70,8 +69,8 @@ final class CoreIntegrationService
         }
 
         try {
-            return (new \Xdecaro\Core\Asset\AssetService())->useFoundation($webAssets);
-        } catch (\Throwable $exception) {
+            return (new \xdecaro\Core\Asset\AssetService())->useFoundation($webAssets);
+        } catch (\Throwable) {
             return false;
         }
     }
@@ -89,7 +88,7 @@ final class CoreIntegrationService
     ): object {
         $this->assertAvailable();
 
-        return new \Xdecaro\Core\Integration\EntityReference(
+        return new \xdecaro\Core\Integration\EntityReference(
             $component,
             $entity,
             $id
@@ -100,7 +99,7 @@ final class CoreIntegrationService
     {
         if (!$this->isAvailable()) {
             throw new \RuntimeException(
-                'Xdecaro Core ' . self::REFERENCE_MINIMUM_VERSION
+                'Core by xdecaro ' . self::REFERENCE_MINIMUM_VERSION
                 . ' or newer is required for Editor cross-product references.'
             );
         }

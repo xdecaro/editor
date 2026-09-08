@@ -47,6 +47,11 @@ jobs:
               assert node is not None and node.text == version, f'{path}: version mismatch'
           data = json.loads(pathlib.Path('component/media/joomla.asset.json').read_text())
           assert data['version'] == version, 'Web Asset version mismatch'
+          source = pathlib.Path('component/admin/src/Service/CoreIntegrationService.php').read_text()
+          assert 'xdecaro\\Core' in source, 'canonical Core namespace missing'
+          assert 'Xdecaro\\Core' not in source, 'deprecated Core namespace must not be consumed'
+          assert "REFERENCE_MINIMUM_VERSION = '1.3.0'" in source, 'Core minimum reference version mismatch'
+          assert "UI_MINIMUM_VERSION = '1.3.0'" in source, 'Core minimum UI version mismatch'
           PY
 
       - name: Build deterministic packages
@@ -69,7 +74,7 @@ jobs:
             "dist/SHA256SUMS.txt" \
             --prerelease \
             --title "Editor by xdecaro ${VERSION}" \
-            --notes "Core 1.1 design-token integration with a complete local fallback. Editor engine, blocks, media behavior and Joomla field integration remain owned by Editor."
+            --notes "Editor ${VERSION}: optional Core by xdecaro 1.3.0+ integration through the canonical xdecaro\\Core namespace, with the existing standalone fallback preserved."
 
       - name: Publish update-feed checksums
         run: |
