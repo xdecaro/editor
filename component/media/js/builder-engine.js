@@ -14,13 +14,11 @@
   });
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const roundWidth = (value) => Math.round(value * 1000) / 1000;
+  const round = (value) => Math.round(value * 1000) / 1000;
 
   class XdecaroBuilderEngine {
     constructor(root, options = {}) {
-      if (!(root instanceof Element)) {
-        throw new TypeError('XdecaroBuilderEngine requires a root Element.');
-      }
+      if (!(root instanceof Element)) throw new TypeError('XdecaroBuilderEngine requires a root Element.');
 
       this.root = root;
       this.options = {...DEFAULTS, ...options};
@@ -46,8 +44,8 @@
       return [...this.root.querySelectorAll(this.options.rowSelector)];
     }
 
-    items(row = this.root) {
-      return [...row.querySelectorAll(this.options.itemSelector)];
+    items(scope = this.root) {
+      return [...scope.querySelectorAll(this.options.itemSelector)];
     }
 
     getItemId(item) {
@@ -69,12 +67,23 @@
     }
 
     prepareRow(row) {
+      const items = this.items(row);
       row.setAttribute('data-xde-builder-row', '');
-      this.items(row).forEach((item) => {
+      items.forEach((item) => {
         this.ensureItemId(item);
         item.draggable = true;
       });
-      if (this.options.autoWidths) this.normalizeRow(row, false);
+
+      // Normalise only new/uninitialised rows. Existing custom layouts (40/60,
+      // 25/75, etc.) must survive refresh(), undo/redo and host re-renders.
+      if (this.options.autoWidths && items.some((item) => !item.hasAttribute(this.options.widthAttribute))) {
+        this.normalizeRow(row, false);
+      } else {
+        items.forEach((item) => {
+          const width = Number(item.getAttribute(this.options.widthAttribute)) || 100;
+          this.writeWidth(item, width);
+        });
+      }
     }
 
     bind() {
@@ -101,8 +110,7 @@
 
     onClick(event) {
       const item = event.target.closest(this.options.itemSelector);
-      if (!item || !this.root.contains(item)) return;
-      this.select(item);
+      if (item && this.root.contains(item)) this.select(item);
     }
 
     select(item) {
@@ -115,7 +123,6 @@
     onDragStart(event) {
       const item = event.target.closest(this.options.itemSelector);
       if (!item || !this.root.contains(item)) return;
-
       this.draggedItem = item;
       this.select(item);
       item.classList.add('is-dragging');
@@ -128,7 +135,7 @@
       this.draggedItem?.classList.remove('is-dragging');
       this.draggedItem = null;
       this.clearDropState();
-      this.emit('dragend', {});
+      this.emit('dragend');
     }
 
     onDragOver(event) {
@@ -150,12 +157,13 @@
       const sourceRow = this.draggedItem.closest(this.options.rowSelector);
       const intent = targetItem && targetItem !== this.draggedItem
         ? this.getDropIntent(targetItem, event.clientX, event.clientY)
-        : {mode: 'row', position: 'append'};
+        : {mode: 'column', position: 'after'};
 
       this.applyDrop(this.draggedItem, targetItem, targetRow, intent);
       this.cleanupRows();
       if (sourceRow?.isConnected && this.options.autoWidths) this.normalizeRow(sourceRow, false);
-      if (targetRow?.isConnected && this.options.autoWidths) this.normalizeRow(targetRow, false);
+      const finalRow = this.draggedItem.closest(this.options.rowSelector);
+      if (finalRow?.isConnected && this.options.autoWidths) this.normalizeRow(finalRow, false);
       this.prepareDom();
       this.captureHistory('move');
       this.clearDropState();
@@ -167,19 +175,15 @@
       const x = clamp((clientX - rect.left) / Math.max(rect.width, 1), 0, 1);
       const y = clamp((clientY - rect.top) / Math.max(rect.height, 1), 0, 1);
 
-      if (y >= 0.25 && y <= 0.75) {
-        return {mode: 'column', position: x < 0.5 ? 'before' : 'after'};
-      }
-
+      // Middle half means "same row"; top/bottom means a new row.
+      if (y >= 0.25 && y <= 0.75) return {mode: 'column', position: x < 0.5 ? 'before' : 'after'};
       return {mode: 'row', position: y < 0.5 ? 'before' : 'after'};
     }
 
     applyDrop(item, targetItem, targetRow, intent) {
       if (intent.mode === 'column' && targetItem) {
-        const rowItems = this.items(targetRow).filter((candidate) => candidate !== item);
-        const resultingCount = rowItems.length + 1;
-
-        if (resultingCount <= this.options.maxColumns) {
+        const count = this.items(targetRow).filter((candidate) => candidate !== item).length + 1;
+        if (count <= this.options.maxColumns) {
           targetItem[intent.position === 'before' ? 'before' : 'after'](item);
           return;
         }
@@ -210,7 +214,6 @@
 
       const sourceRow = item.closest(this.options.rowSelector);
       const targetRow = target.closest(this.options.rowSelector);
-
       if (sameRow && this.items(targetRow).filter((candidate) => candidate !== item).length < this.options.maxColumns) {
         target[position === 'before' ? 'before' : 'after'](item);
       } else {
@@ -221,7 +224,8 @@
 
       this.cleanupRows();
       if (sourceRow?.isConnected && this.options.autoWidths) this.normalizeRow(sourceRow, false);
-      if (targetRow?.isConnected && this.options.autoWidths) this.normalizeRow(targetRow, false);
+      const finalRow = item.closest(this.options.rowSelector);
+      if (finalRow?.isConnected && this.options.autoWidths) this.normalizeRow(finalRow, false);
       this.prepareDom();
       this.captureHistory('move');
       this.emitChange('move', {itemId: this.getItemId(item), targetId: this.getItemId(target), position, sameRow});
@@ -232,17 +236,15 @@
       const item = this.resolveItem(itemOrId);
       if (!item) return false;
       const row = item.closest(this.options.rowSelector);
-      const siblings = this.items(row);
-      if (!row || !siblings.length) return false;
+      const siblings = row ? this.items(row) : [];
+      if (!siblings.length) return false;
 
-      const requested = clamp(Number(width) || 100, 1, 100);
-      const value = siblings.length === 1 ? 100 : requested;
+      const value = siblings.length === 1 ? 100 : clamp(Number(width) || 100, 1, 99);
       this.writeWidth(item, value);
 
       if (rebalance && siblings.length > 1) {
         const others = siblings.filter((candidate) => candidate !== item);
-        const remainder = Math.max(0, 100 - value);
-        const otherWidth = remainder / others.length;
+        const otherWidth = (100 - value) / others.length;
         others.forEach((candidate) => this.writeWidth(candidate, otherWidth));
       }
 
@@ -261,7 +263,7 @@
     }
 
     writeWidth(item, width) {
-      const value = roundWidth(width);
+      const value = round(width);
       item.setAttribute(this.options.widthAttribute, String(value));
       item.style.setProperty('--xde-builder-width', `${value}%`);
     }
@@ -274,14 +276,12 @@
 
     requestDuplicate(itemOrId = this.selectedItem) {
       const item = this.resolveItem(itemOrId);
-      if (!item) return;
-      this.emit('duplicate-request', {item, itemId: this.getItemId(item)});
+      if (item) this.emit('duplicate-request', {item, itemId: this.getItemId(item)});
     }
 
     requestDelete(itemOrId = this.selectedItem) {
       const item = this.resolveItem(itemOrId);
-      if (!item) return;
-      this.emit('delete-request', {item, itemId: this.getItemId(item)});
+      if (item) this.emit('delete-request', {item, itemId: this.getItemId(item)});
     }
 
     refresh() {
@@ -307,6 +307,7 @@
     applySnapshot(snapshot, notify = true) {
       if (!Array.isArray(snapshot)) return false;
       const existing = new Map(this.items().map((item) => [this.getItemId(item), item]));
+      const used = new Set();
       const fragment = document.createDocumentFragment();
 
       snapshot.forEach((rowState) => {
@@ -314,18 +315,19 @@
         (rowState.items || []).forEach((itemState) => {
           const item = existing.get(itemState.id);
           if (!item) return;
+          used.add(itemState.id);
           this.writeWidth(item, Number(itemState.width) || 100);
           row.append(item);
         });
         if (this.items(row).length) fragment.append(row);
       });
 
-      existing.forEach((item) => {
-        if (!fragment.contains(item)) {
-          const row = this.createRow();
-          row.append(item);
-          fragment.append(row);
-        }
+      existing.forEach((item, id) => {
+        if (used.has(id)) return;
+        const row = this.createRow();
+        row.append(item);
+        this.writeWidth(item, 100);
+        fragment.append(row);
       });
 
       this.rows().forEach((row) => row.remove());
@@ -345,19 +347,14 @@
       this.emit('history', {canUndo: this.canUndo(), canRedo: this.canRedo(), reason});
     }
 
-    canUndo() {
-      return this.historyIndex > 0;
-    }
-
-    canRedo() {
-      return this.historyIndex >= 0 && this.historyIndex < this.history.length - 1;
-    }
+    canUndo() { return this.historyIndex > 0; }
+    canRedo() { return this.historyIndex >= 0 && this.historyIndex < this.history.length - 1; }
 
     undo() {
       if (!this.canUndo()) return false;
       this.historyIndex -= 1;
       this.applySnapshot(JSON.parse(this.history[this.historyIndex].state), false);
-      this.emitChange('undo', {snapshot: this.snapshot()});
+      this.emitChange('undo');
       this.emit('history', {canUndo: this.canUndo(), canRedo: this.canRedo(), reason: 'undo'});
       return true;
     }
@@ -366,15 +363,14 @@
       if (!this.canRedo()) return false;
       this.historyIndex += 1;
       this.applySnapshot(JSON.parse(this.history[this.historyIndex].state), false);
-      this.emitChange('redo', {snapshot: this.snapshot()});
+      this.emitChange('redo');
       this.emit('history', {canUndo: this.canUndo(), canRedo: this.canRedo(), reason: 'redo'});
       return true;
     }
 
     onKeyDown(event) {
       if (!(event.ctrlKey || event.metaKey) || !this.root.contains(document.activeElement)) return;
-      const key = event.key.toLowerCase();
-      if (key !== 'z') return;
+      if (event.key.toLowerCase() !== 'z') return;
       event.preventDefault();
       event.shiftKey ? this.redo() : this.undo();
     }
@@ -411,9 +407,8 @@
 
     static mount(root, options = {}) {
       if (root.__xdecaroBuilderEngine) return root.__xdecaroBuilderEngine;
-      const engine = new XdecaroBuilderEngine(root, options);
-      root.__xdecaroBuilderEngine = engine;
-      return engine;
+      root.__xdecaroBuilderEngine = new XdecaroBuilderEngine(root, options);
+      return root.__xdecaroBuilderEngine;
     }
 
     static mountAll(selector = DEFAULTS.rootSelector, options = {}) {
