@@ -3,6 +3,7 @@ name: Build Joomla packages
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
   release:
     types: [published]
