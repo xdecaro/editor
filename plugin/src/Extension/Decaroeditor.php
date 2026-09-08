@@ -11,6 +11,7 @@ namespace Xdecaro\Plugin\Editors\Decaroeditor\Extension;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\CMS\WebAsset\WebAssetManager;
 
 final class Decaroeditor extends CMSPlugin
 {
@@ -28,6 +29,7 @@ final class Decaroeditor extends CMSPlugin
 
         $wa = $app->getDocument()->getWebAssetManager();
         $wa->getRegistry()->addExtensionRegistryFile('com_decaroeditor');
+        $this->useCoreFoundation($wa);
         $wa->useStyle('com_decaroeditor.editor');
         $wa->useScript('com_decaroeditor.editor');
         $wa->useScript('com_decaroeditor.field');
@@ -58,7 +60,7 @@ final class Decaroeditor extends CMSPlugin
         unset($label);
 
         return <<<HTML
-<div class="xde-editor-field" data-xde-field-editor>
+<div class="xde-editor-field xdecaro-scope" data-xde-field-editor>
     <textarea name="{$safeName}" id="{$safeId}" hidden>{$safeContent}</textarea>
     <div class="xde-editor-shell xde-editor-shell--field" data-xde-editor data-xde-source="#{$safeId}">
         <aside class="xde-editor-sidebar xde-editor-sidebar--blocks">
@@ -107,5 +109,21 @@ HTML;
     public function onGetInsertMethod()
     {
         return "Joomla.editors.instances[editor]?.replaceSelection(text);";
+    }
+
+    private function useCoreFoundation(WebAssetManager $webAssets): bool
+    {
+        if (!class_exists(\Xdecaro\Core\Version::class)
+            || !class_exists(\Xdecaro\Core\Asset\AssetService::class)
+            || version_compare(\Xdecaro\Core\Version::VERSION, '1.1.0', '<')
+        ) {
+            return false;
+        }
+
+        try {
+            return (new \Xdecaro\Core\Asset\AssetService())->useFoundation($webAssets);
+        } catch (\Throwable $exception) {
+            return false;
+        }
     }
 }
