@@ -17,16 +17,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Validate PHP and optional Core adapter
+        run: |
+          find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          php tests/core-integration-smoke.php
+
       - name: Build packages
         run: |
           chmod +x tools/build.sh
-          tools/build.sh 0.1.0-alpha1
+          tools/build.sh 0.1.0-alpha2
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: decaroeditor-0.1.0-alpha1
+          name: decaroeditor-0.1.0-alpha2
           path: |
-            dist/com_decaroeditor_0.1.0-alpha1.zip
-            dist/plg_editors_decaroeditor_0.1.0-alpha1.zip
-            dist/pkg_decaroeditor_0.1.0-alpha1.zip
+            dist/com_decaroeditor_0.1.0-alpha2.zip
+            dist/plg_editors_decaroeditor_0.1.0-alpha2.zip
+            dist/pkg_decaroeditor_0.1.0-alpha2.zip

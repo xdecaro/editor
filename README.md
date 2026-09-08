@@ -10,7 +10,7 @@ The editor must remain fast, visual, accessible and easy to use without requirin
 
 ## Current development version
 
-**0.1.0-alpha1**
+**0.1.0-alpha2**
 
 Version `1.0.0` is reserved for the first stable release after installation, Joomla editor integration, media handling, accessibility and responsive regression checks are complete.
 
@@ -104,6 +104,14 @@ AI features are optional enhancements and must never be required to use the edit
 The editor core is intended to be reusable by Joomla Articles and other xdecaro components such as Courses, Competitions, Forms and future products. The implementation must avoid duplicating the editor engine inside each component.
 
 All interface strings use Joomla language files. The technical default language is `en-GB`, with `it-IT` included from the first release and additional languages added without changing application logic.
+
+## Xdecaro Core integration
+
+Editor supports the Xdecaro Core `1.0.0+` public reference contract through an optional runtime adapter. Other components can identify the entity being edited without exposing private tables or duplicating integration rules.
+
+Editor continues to work without Core; only features that explicitly require cross-product references are unavailable and fail with a controlled administrator-facing error. The editor engine remains in Editor and is never moved into Core.
+
+See `docs/core-integration.md` for the integration boundary and service API.
 
 ## Engineering rules
 
