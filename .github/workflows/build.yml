@@ -29,7 +29,11 @@ jobs:
           find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
           php tests/core-integration-smoke.php
 
-      - name: Validate XML and version coherence
+      - name: Validate JavaScript assets
+        run: |
+          find component/media/js plugin/media/js -type f -name '*.js' -print0 2>/dev/null | xargs -0 -r -n1 node --check
+
+      - name: Validate XML, assets and version coherence
         run: |
           python3 - <<'PY'
           import json, pathlib, xml.etree.ElementTree as ET
@@ -40,6 +44,14 @@ jobs:
               assert node is not None and node.text == version, f'{path}: version mismatch'
           data = json.loads(pathlib.Path('component/media/joomla.asset.json').read_text())
           assert data['version'] == version, 'Web Asset version mismatch'
+          for asset in data.get('assets', []):
+              uri = asset.get('uri', '')
+              prefix = 'com_decaroeditor/'
+              if not uri.startswith(prefix):
+                  continue
+              relative = uri[len(prefix):]
+              path = pathlib.Path('component/media') / relative
+              assert path.is_file(), f'Web Asset target missing: {uri}'
           PY
 
       - name: Deterministic build A
