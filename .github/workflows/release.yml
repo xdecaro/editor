@@ -1,0 +1,95 @@
+name: Release Joomla packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - VERSION
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Read version
+        run: echo "VERSION=$(cat VERSION)" >> "$GITHUB_ENV"
+
+      - name: Refuse an existing release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists"
+            exit 1
+          fi
+
+      - name: Validate PHP, Core fallback and metadata
+        run: |
+          find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          php tests/core-integration-smoke.php
+          python3 - <<'PY'
+          import json, pathlib, xml.etree.ElementTree as ET
+          version = pathlib.Path('VERSION').read_text().strip()
+          for path in ['component/decaroeditor.xml', 'plugin/decaroeditor.xml', 'package/pkg_decaroeditor.xml', 'updates/com_decaroeditor.xml', 'updates/pkg_decaroeditor.xml']:
+              root = ET.parse(path).getroot()
+              node = root.find('version') if root.tag == 'extension' else root.find('./update/version')
+              assert node is not None and node.text == version, f'{path}: version mismatch'
+          data = json.loads(pathlib.Path('component/media/joomla.asset.json').read_text())
+          assert data['version'] == version, 'Web Asset version mismatch'
+          PY
+
+      - name: Build deterministic packages
+        run: |
+          chmod +x tools/build.sh
+          tools/build.sh "${VERSION}"
+          cp dist/SHA256SUMS.txt /tmp/editor-sums
+          tools/build.sh "${VERSION}"
+          diff -u /tmp/editor-sums dist/SHA256SUMS.txt
+          for file in dist/*.zip; do unzip -t "$file" >/dev/null; done
+
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${VERSION}" \
+            "dist/com_decaroeditor_${VERSION}.zip" \
+            "dist/plg_editors_decaroeditor_${VERSION}.zip" \
+            "dist/pkg_decaroeditor_${VERSION}.zip" \
+            "dist/SHA256SUMS.txt" \
+            --prerelease \
+            --title "Editor by xdecaro ${VERSION}" \
+            --notes "Core 1.1 design-token integration with a complete local fallback. Editor engine, blocks, media behavior and Joomla field integration remain owned by Editor."
+
+      - name: Publish update-feed checksums
+        run: |
+          export COMPONENT_SHA="$(sha256sum "dist/com_decaroeditor_${VERSION}.zip" | awk '{print $1}')"
+          export PACKAGE_SHA="$(sha256sum "dist/pkg_decaroeditor_${VERSION}.zip" | awk '{print $1}')"
+          python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          for file, sha in [
+              ('updates/com_decaroeditor.xml', os.environ['COMPONENT_SHA']),
+              ('updates/pkg_decaroeditor.xml', os.environ['PACKAGE_SHA']),
+          ]:
+              path = Path(file)
+              text = path.read_text()
+              text = re.sub(r'\n\s*<sha256>[^<]*</sha256>', '', text)
+              text = text.replace('        </downloads>', f'        </downloads>\n        <sha256>{sha}</sha256>', 1)
+              path.write_text(text)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/com_decaroeditor.xml updates/pkg_decaroeditor.xml
+          git diff --cached --quiet || git commit -m "Publish SHA-256 for Editor ${VERSION}"
+          git push

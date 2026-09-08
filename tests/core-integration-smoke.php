@@ -12,6 +12,10 @@ if ($service->isAvailable()) {
     throw new RuntimeException('Core should not be available in the isolated Editor smoke test.');
 }
 
+if ($service->isUiAvailable()) {
+    throw new RuntimeException('Core UI should not be available in the isolated Editor smoke test.');
+}
+
 if ($service->getInstalledVersion() !== null) {
     throw new RuntimeException('An absent Core installation must report no installed version.');
 }

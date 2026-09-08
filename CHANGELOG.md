@@ -2,6 +2,17 @@
 
 All notable changes to Editor by xdecaro are documented here.
 
+## 0.1.0-alpha3 — 2026-09-08
+
+- Added optional Core by xdecaro `1.1.0+` design-token foundation loading.
+- Wrapped the administrator workbench and Joomla editor field in `.xdecaro-scope`.
+- Bridged Editor surface, border, muted, primary, success, radius and shadow tokens to Core with complete local fallbacks.
+- Preserved the existing Core `1.0.0+` entity-reference contract for backward compatibility.
+- Added explicit Core UI availability detection and graceful failure handling.
+- Added deterministic ZIP generation and SHA-256 checksums.
+- Added the first real GitHub prerelease workflow for Editor packages.
+- Kept the Editor engine, blocks, media behavior, history and JavaScript outside Core.
+
 ## 0.1.0-alpha2 — 2026-09-08
 
 - Added the optional Xdecaro Core `1.0.0+` runtime adapter.
