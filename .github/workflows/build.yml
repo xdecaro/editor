@@ -29,16 +29,37 @@ jobs:
           find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
           php tests/core-integration-smoke.php
 
-      - name: Build packages
+      - name: Validate XML and version coherence
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, xml.etree.ElementTree as ET
+          version = pathlib.Path('VERSION').read_text().strip()
+          for path in ['component/decaroeditor.xml', 'plugin/decaroeditor.xml', 'package/pkg_decaroeditor.xml', 'updates/com_decaroeditor.xml', 'updates/pkg_decaroeditor.xml']:
+              root = ET.parse(path).getroot()
+              node = root.find('version') if root.tag == 'extension' else root.find('./update/version')
+              assert node is not None and node.text == version, f'{path}: version mismatch'
+          data = json.loads(pathlib.Path('component/media/joomla.asset.json').read_text())
+          assert data['version'] == version, 'Web Asset version mismatch'
+          PY
+
+      - name: Deterministic build A
         run: |
           chmod +x tools/build.sh
-          tools/build.sh 0.1.0-alpha2
+          tools/build.sh "$(cat VERSION)"
+          cp dist/SHA256SUMS.txt /tmp/editor-sums
+          for file in dist/*.zip; do unzip -t "$file" >/dev/null; done
+
+      - name: Deterministic build B
+        run: |
+          tools/build.sh "$(cat VERSION)"
+          diff -u /tmp/editor-sums dist/SHA256SUMS.txt
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: decaroeditor-0.1.0-alpha2
+          name: decaroeditor-${{ github.sha }}
           path: |
-            dist/com_decaroeditor_0.1.0-alpha2.zip
-            dist/plg_editors_decaroeditor_0.1.0-alpha2.zip
-            dist/pkg_decaroeditor_0.1.0-alpha2.zip
+            dist/com_decaroeditor_*.zip
+            dist/plg_editors_decaroeditor_*.zip
+            dist/pkg_decaroeditor_*.zip
+            dist/SHA256SUMS.txt
