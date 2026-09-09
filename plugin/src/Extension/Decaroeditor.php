@@ -8,19 +8,48 @@ namespace Xdecaro\Plugin\Editors\Decaroeditor\Extension;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Event\Editor\EditorSetupEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\WebAsset\WebAssetManager;
+use Joomla\Event\SubscriberInterface;
+use Xdecaro\Plugin\Editors\Decaroeditor\Provider\EditorDecaroProvider;
 
-final class Decaroeditor extends CMSPlugin
+final class Decaroeditor extends CMSPlugin implements SubscriberInterface
 {
     protected $autoloadLanguage = true;
 
     /**
-     * Render the editor field while keeping the original textarea as the canonical Joomla value.
+     * Register the modern Joomla editor provider while retaining the legacy
+     * entry points below for Joomla versions that still invoke them directly.
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            'onEditorSetup' => 'onEditorSetup',
+        ];
+    }
+
+    public function onEditorSetup(EditorSetupEvent $event): void
+    {
+        $event->getEditorsRegistry()->add(
+            new EditorDecaroProvider($this, $this->getDispatcher())
+        );
+    }
+
+    /**
+     * Legacy Joomla editor entry point retained for backward compatibility.
      */
     public function onDisplay($name, $content, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null)
+    {
+        return $this->renderEditor($name, $content, $width, $height, $col, $row, $buttons, $id, $asset, $author);
+    }
+
+    /**
+     * Render the editor field while keeping the original textarea as the canonical Joomla value.
+     */
+    public function renderEditor($name, $content, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null): string
     {
         $id = $id ?: preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $name);
 
