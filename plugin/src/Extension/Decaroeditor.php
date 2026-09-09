@@ -113,15 +113,15 @@ HTML;
 
     private function useCoreFoundation(WebAssetManager $webAssets): bool
     {
-        if (!class_exists(\Xdecaro\Core\Version::class)
-            || !class_exists(\Xdecaro\Core\Asset\AssetService::class)
-            || version_compare(\Xdecaro\Core\Version::VERSION, '1.1.0', '<')
+        if (!class_exists(\xdecaro\Core\Version::class)
+            || !class_exists(\xdecaro\Core\Asset\AssetService::class)
+            || version_compare(\xdecaro\Core\Version::VERSION, '1.3.0', '<')
         ) {
             return false;
         }
 
         try {
-            return (new \Xdecaro\Core\Asset\AssetService())->useFoundation($webAssets);
+            return (new \xdecaro\Core\Asset\AssetService())->useFoundation($webAssets);
         } catch (\Throwable $exception) {
             return false;
         }
