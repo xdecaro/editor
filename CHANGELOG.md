@@ -2,6 +2,13 @@
 
 All notable changes to Editor by xdecaro are documented here.
 
+## 0.1.0-alpha5 — 2026-09-09
+
+- Fixed the Joomla editor plugin so it consumes the canonical `xdecaro\Core` namespace instead of the deprecated compatibility namespace.
+- Raised the plugin-side optional Core UI minimum to 1.3.0, matching the component adapter.
+- Preserved standalone Editor behavior when Core is absent or incompatible.
+- No editor-engine, block, media, history or content-format behavior changed.
+
 ## 0.1.0-alpha4 — 2026-09-09
 
 - Migrated optional Core consumption to the canonical `xdecaro\Core` namespace introduced by Core 1.3.0.
