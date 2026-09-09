@@ -28,6 +28,7 @@ jobs:
         run: |
           find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
           php tests/core-integration-smoke.php
+          ! grep -RInF 'Xdecaro\Core' component plugin --include='*.php'
 
       - name: Validate XML, version and canonical Core namespace
         run: |
@@ -45,6 +46,9 @@ jobs:
           assert 'Xdecaro\\Core' not in source, 'deprecated Core namespace must not be consumed'
           assert "REFERENCE_MINIMUM_VERSION = '1.3.0'" in source, 'Core minimum reference version mismatch'
           assert "UI_MINIMUM_VERSION = '1.3.0'" in source, 'Core minimum UI version mismatch'
+          plugin = pathlib.Path('plugin/src/Extension/Decaroeditor.php').read_text()
+          assert 'xdecaro\\Core' in plugin and 'Xdecaro\\Core' not in plugin, 'plugin Core namespace mismatch'
+          assert "version_compare(\\xdecaro\\Core\\Version::VERSION, '1.3.0', '<')" in plugin, 'plugin Core UI minimum mismatch'
           PY
 
       - name: Deterministic build A
