@@ -34,11 +34,12 @@ jobs:
             exit 1
           fi
 
-      - name: Validate PHP, Core fallback and metadata
+      - name: Validate PHP, Core fallback, field bridge and metadata
         run: |
           find component plugin tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
           php tests/core-integration-smoke.php
           ! grep -RInF 'Xdecaro\Core' component plugin --include='*.php'
+          node --check component/media/js/field-bridge.js
           python3 - <<'PY'
           import json, pathlib, xml.etree.ElementTree as ET
           version = pathlib.Path('VERSION').read_text().strip()
@@ -56,6 +57,11 @@ jobs:
           plugin = pathlib.Path('plugin/src/Extension/Decaroeditor.php').read_text()
           assert 'xdecaro\\Core' in plugin and 'Xdecaro\\Core' not in plugin, 'plugin Core namespace mismatch'
           assert "version_compare(\\xdecaro\\Core\\Version::VERSION, '1.3.0', '<')" in plugin, 'plugin Core UI minimum mismatch'
+          bridge = pathlib.Path('component/media/js/field-bridge.js').read_text()
+          assert 'const initializedRoots = new WeakSet();' in bridge
+          assert 'const boundForms = new WeakSet();' in bridge
+          assert 'Joomla.XdecaroEditor.scan = scan;' in bridge
+          assert 'Joomla.editors.instances[source.id]' in bridge
           PY
 
       - name: Build deterministic packages
@@ -78,7 +84,7 @@ jobs:
             "dist/SHA256SUMS.txt" \
             --prerelease \
             --title "Editor by xdecaro ${VERSION}" \
-            --notes "Editor ${VERSION}: optional Core by xdecaro 1.3.0+ integration through the canonical xdecaro\\Core namespace, with the existing standalone fallback preserved."
+            --notes "Editor ${VERSION}: idempotent public dynamic-field bridge through Joomla.XdecaroEditor.scan(root), while preserving the standard Joomla.editors.instances contract, optional Core 1.3.0+ integration and standalone fallback."
 
       - name: Publish update-feed checksums
         run: |
