@@ -6,7 +6,7 @@
     <copyright>(C) 2026 Luca De Caro</copyright>
     <license>GNU General Public License version 2 or later</license>
     <authorEmail></authorEmail>
-    <version>0.1.0-alpha4</version>
+    <version>0.1.0-alpha5</version>
     <description>COM_DECAROEDITOR_XML_DESCRIPTION</description>
     <namespace path="src">Xdecaro\Component\Decaroeditor</namespace>
 
