@@ -10,7 +10,7 @@ The editor must remain fast, visual, accessible and easy to use without requirin
 
 ## Current development version
 
-**0.1.0-alpha4**
+**0.1.0-alpha6**
 
 Version `1.0.0` is reserved for the first stable release after installation, Joomla editor integration, media handling, accessibility and responsive regression checks are complete.
 
@@ -23,11 +23,13 @@ Version `1.0.0` is reserved for the first stable release after installation, Joo
 
 ## Current alpha implementation
 
-The repository now contains the first installable architecture for the project:
+The repository contains the installable project architecture:
 
 - Joomla 6 administrator component scaffold;
 - reusable shared editor CSS/JavaScript assets;
-- Joomla `editors` plugin scaffold that keeps the original textarea as the canonical form value;
+- Joomla `editors` plugin that keeps the original textarea as the canonical form value;
+- public, idempotent `Joomla.XdecaroEditor.scan(root)` bridge for editor fields inserted dynamically;
+- standard `Joomla.editors.instances` integration for get/set/insert/save operations;
 - visual three-area editing interface;
 - initial block insertion;
 - slash-menu insertion;
@@ -102,7 +104,17 @@ AI features are optional enhancements and must never be required to use the edit
 
 ## Joomla integration
 
-The editor core is intended to be reusable by Joomla Articles and other xdecaro components such as Courses, Competitions, Forms and future products. The implementation must avoid duplicating the editor engine inside each component.
+Editor is reusable through Joomla's normal editor-plugin contract. Other components should not call Editor component internals or duplicate its engine. They render/use the editor plugin through Joomla and interact with the standard `Joomla.editors.instances` API.
+
+For dynamic interfaces, after inserting editor markup into the DOM, consumers may call:
+
+```js
+Joomla.XdecaroEditor?.scan(container);
+```
+
+The scan is idempotent: already initialized editor roots are ignored. The hidden textarea remains the canonical submitted value and existing pages that never call `scan()` continue to initialize automatically on DOM ready.
+
+This public bridge is product-neutral. Forms, Courses, Events and other consumers remain responsible for their own data model, validation, workflow and persistence.
 
 All interface strings use Joomla language files. The technical default language is `en-GB`, with `it-IT` included from the first release and additional languages added without changing application logic.
 
