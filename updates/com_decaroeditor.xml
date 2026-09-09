@@ -9,6 +9,7 @@
         <downloads>
             <downloadurl type="full" format="zip">https://github.com/xdecaro/editor/releases/download/v0.1.0-alpha6/com_decaroeditor_0.1.0-alpha6.zip</downloadurl>
         </downloads>
+        <sha256>0167e61169dd79a3d63ab07fa73d058ecb32fadd707b3134cfb4674ef6397e1d</sha256>
         <targetplatform name="joomla" version="6.*" />
         <php_minimum>8.3</php_minimum>
     </update>
