@@ -30,6 +30,20 @@ jobs:
           php tests/core-integration-smoke.php
           ! grep -RInF 'Xdecaro\Core' component plugin --include='*.php'
 
+      - name: Validate JavaScript field bridge
+        run: |
+          node --check component/media/js/field-bridge.js
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('component/media/js/field-bridge.js').read_text()
+          assert 'const initializedRoots = new WeakSet();' in source
+          assert 'const boundForms = new WeakSet();' in source
+          assert 'Joomla.XdecaroEditor.scan = scan;' in source
+          assert 'Joomla.editors.instances[source.id]' in source
+          assert "data-xde-editor-initialized" in source
+          assert "form.querySelectorAll(FIELD_SELECTOR)" in source
+          PY
+
       - name: Validate XML, version and canonical Core namespace
         run: |
           python3 - <<'PY'

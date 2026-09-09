@@ -2,6 +2,14 @@
 
 All notable changes to Editor by xdecaro are documented here.
 
+## 0.1.0-alpha6 — 2026-09-09
+
+- Added the public `Joomla.XdecaroEditor.scan(root)` bridge for editor fields inserted after the initial page load.
+- Made editor-field registration idempotent so repeated scans do not duplicate input/click listeners or editor instances.
+- Changed form-submit synchronization to one listener per form, preventing listener accumulation when dynamic consumers re-render editor fields.
+- Preserved Joomla's standard `Joomla.editors.instances` contract and the hidden textarea as the canonical submitted value.
+- Kept the bridge product-neutral: no Forms-specific classes, selectors, data model or private APIs were introduced.
+
 ## 0.1.0-alpha5 — 2026-09-09
 
 - Fixed the Joomla editor plugin so it consumes the canonical `xdecaro\Core` namespace instead of the deprecated compatibility namespace.
@@ -27,7 +35,7 @@ All notable changes to Editor by xdecaro are documented here.
 - Added explicit Core UI availability detection and graceful failure handling.
 - Added deterministic ZIP generation and SHA-256 checksums.
 - Added the first real GitHub prerelease workflow for Editor packages.
-- Kept the Editor engine, blocks, media behavior, history and JavaScript outside Core.
+- Kept the Editor engine, blocks, media behavior, history, responsive editing and JavaScript outside Core.
 
 ## 0.1.0-alpha2 — 2026-09-08
 
