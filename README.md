@@ -10,7 +10,7 @@ The editor must remain fast, visual, accessible and easy to use without requirin
 
 ## Current development version
 
-**0.1.0-alpha6**
+**0.1.0-alpha7**
 
 Version `1.0.0` is reserved for the first stable release after installation, Joomla editor integration, media handling, accessibility and responsive regression checks are complete.
 
@@ -30,6 +30,8 @@ The repository contains the installable project architecture:
 - Joomla `editors` plugin that keeps the original textarea as the canonical form value;
 - public, idempotent `Joomla.XdecaroEditor.scan(root)` bridge for editor fields inserted dynamically;
 - standard `Joomla.editors.instances` integration for get/set/insert/save operations;
+- reusable domain-neutral Visual Builder Engine for rows, columns, widths, layout snapshots and layout-only undo/redo;
+- separate host-managed Pointer Events intent controller for incremental integration by mature builders;
 - visual three-area editing interface;
 - initial block insertion;
 - slash-menu insertion;
@@ -44,6 +46,14 @@ The repository contains the installable project architecture:
 - deterministic build script, SHA-256 checksums and GitHub Actions package build/release workflows.
 
 The alpha is a development baseline, not the final production release. Media Manager integration, real non-destructive crop derivatives, persistent revision history and final security/accessibility regression testing remain release milestones.
+
+## Shared Visual Builder Engine
+
+Editor exposes the domain-neutral Joomla assets `com_decaroeditor.builder-engine` and `com_decaroeditor.builder-intents`. They are independent from the rich-content editor asset and do not force the editor UI to load.
+
+The Builder owns reusable visual interaction primitives such as selection, row/column placement, maximum four-column layouts, width distribution, layout snapshots and generic events. Consuming components remain responsible for their own domain records, validation, persistence, workflow and canonical history.
+
+Mature builders such as Forms should migrate incrementally through the host-managed intent controller and must demonstrate feature parity before replacing an existing runtime. See `docs/builder-engine.md` for the public contract and migration boundary.
 
 ## Core interface
 
