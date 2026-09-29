@@ -2,6 +2,19 @@
 
 All notable changes to Editor by xdecaro are documented here.
 
+## 0.1.0-alpha7 — 2026-09-29
+
+- Consolidated the shared Visual Builder Engine from the earlier draft foundation onto the current alpha6 baseline.
+- Added independent Joomla assets for the reusable Builder Engine and host-managed Pointer Events intent controller.
+- Added row/column placement, maximum four-column layouts, automatic/custom width handling, layout snapshots, undo/redo and reusable Builder lifecycle/events.
+- Added contract and Web Asset Manager CI guards, including product-neutrality checks and validation that every declared local asset exists in the package.
+- Added runtime lifecycle regression coverage for mount/destroy/remount and listener cleanup.
+- Fixed Builder Engine and Intent Controller remounting after `destroy()` by clearing their root-instance references.
+- Fixed idle Intent Controller destruction so it no longer emits a spurious `xdecaro:builder:dragend` event.
+- Preserved the alpha6 Joomla editor provider, idempotent `Joomla.XdecaroEditor.scan(root)` bridge, one-submit-listener-per-form behavior, `Joomla.editors.instances` contract and canonical textarea synchronization.
+- Kept Forms and other consuming components responsible for domain state, validation, persistence and host-owned history; no mandatory consumer dependency was introduced.
+- Media Manager, non-destructive crop derivatives and persistent revision history remain later milestones.
+
 ## 0.1.0-alpha6 — 2026-09-09
 
 - Added the public `Joomla.XdecaroEditor.scan(root)` bridge for editor fields inserted after the initial page load.

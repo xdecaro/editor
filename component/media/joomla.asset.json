@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
   "name": "com_decaroeditor",
-  "version": "0.1.0-alpha6",
+  "version": "0.1.0-alpha7",
   "description": "Editor by xdecaro assets",
   "license": "GPL-2.0-or-later",
   "assets": [
@@ -21,6 +21,18 @@
       "type": "script",
       "uri": "com_decaroeditor/js/field-bridge.js",
       "dependencies": ["com_decaroeditor.editor"],
+      "attributes": {"defer": true}
+    },
+    {
+      "name": "com_decaroeditor.builder-engine",
+      "type": "script",
+      "uri": "com_decaroeditor/js/builder-engine.js",
+      "attributes": {"defer": true}
+    },
+    {
+      "name": "com_decaroeditor.builder-intents",
+      "type": "script",
+      "uri": "com_decaroeditor/js/builder-intent-controller.js",
       "attributes": {"defer": true}
     }
   ]
