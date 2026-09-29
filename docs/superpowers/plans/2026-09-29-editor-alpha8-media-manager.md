@@ -41,7 +41,7 @@
 - `component/media/css/editor.css` — responsive/light-dark media property UI.
 - `component/media/joomla.asset.json` — registers media assets and dependency order.
 - `component/admin/src/View/Editor/HtmlView.php` + `component/admin/tmpl/editor/default.php` — make native media proxies available in the administrator workbench.
-- `plugin/src/Extension/Decaroeditor.php` — make the same media capability available when Editor is embedded as the Joomla editor provider.
+- `plugin/src/Extension/Decaroeditor.php` — make the same media capability and File block available when Editor is embedded as the Joomla editor provider.
 - `component/admin/language/{en-GB,it-IT}/com_decaroeditor.ini` — alpha8 labels/messages.
 - `tests/media-selection-smoke.mjs` — pure safety/normalization tests.
 - `tests/media-bridge-lifecycle-smoke.mjs` — bridge mount/open/cancel/destroy/remount/supersede tests.
@@ -153,7 +153,6 @@ Commit message: `feat: bridge editor to native Joomla media picker`
 - Create: `component/admin/src/Service/MediaPickerService.php`
 - Create: `tests/media-integration-contract-smoke.mjs`
 - Modify: `component/decaroeditor.xml` (ship `forms` folder)
-- Modify: `component/admin/services/provider.php`
 - Modify: `component/admin/src/View/Editor/HtmlView.php`
 - Modify: `component/admin/tmpl/editor/default.php`
 - Modify: `plugin/src/Extension/Decaroeditor.php`
@@ -173,6 +172,7 @@ Assert source/package contract:
 - administrator workbench renders proxies inside its Editor root;
 - plugin `renderEditor()` renders proxies for each editor instance and loads `com_decaroeditor.media-bridge`;
 - two different scope ids generate distinct control ids/names;
+- if the component media service cannot be autoloaded, the plugin renderer does not fatal and leaves normal Editor/manual URL behavior available;
 - no `com_xdecarophotos` hard dependency/private table reference is introduced.
 
 - [ ] **Step 2: Run contract test and verify RED**
@@ -190,11 +190,14 @@ Service responsibilities:
 - register new alpha8 language strings via `Text::script(...)` once per request;
 - return an empty/controlled fallback only if Joomla media field rendering itself is unavailable; do not introduce custom upload behavior.
 
+The service is stateless; it does not require a cross-extension DI container contract.
+
 - [ ] **Step 4: Wire both render surfaces**
 
-- Administrator `HtmlView`: obtain the shared service from DI, expose proxy markup, load `media-bridge`.
-- Administrator template: output proxy markup inside `data-xde-editor` scope.
-- Editor plugin: reuse the same component service when available; append uniquely scoped proxy markup inside each `data-xde-editor` shell; if the service is unavailable, keep the editor functional with manual URL fallback and no fatal error.
+- Administrator `HtmlView`: instantiate `MediaPickerService`, expose proxy markup, and load `com_decaroeditor.media-bridge`.
+- Administrator template: output proxy markup inside the `data-xde-editor` scope.
+- Editor plugin: guard with `class_exists(\Xdecaro\Component\Decaroeditor\Administrator\Service\MediaPickerService::class)`, instantiate the same stateless service when available, append uniquely scoped proxy markup inside each `data-xde-editor` shell, and load `media-bridge` only when proxies are available.
+- If the service/component is unavailable, keep the editor functional with its existing manual URL behavior and no fatal error.
 
 - [ ] **Step 5: Verify PHP/source contracts and package file presence**
 
@@ -212,6 +215,7 @@ Commit message: `feat: render native Joomla media proxies`
 - Modify: `component/media/css/editor.css`
 - Modify: `component/admin/language/en-GB/com_decaroeditor.ini`
 - Modify: `component/admin/language/it-IT/com_decaroeditor.ini`
+- Modify: `plugin/src/Extension/Decaroeditor.php`
 - Extend: `tests/media-integration-contract-smoke.mjs`
 
 **Interfaces:**
@@ -224,6 +228,7 @@ Pin these behaviors in the source/runtime smoke harness:
 - Editor mounts one media bridge per Editor root when available;
 - Image properties expose translated Select/Replace/Remove actions and preserve existing alt/caption/ratio/focal-position controls;
 - File properties expose translated Select/Replace/Remove plus label and selected path/name display;
+- the Joomla editor plugin exposes the File block and uses the same shared Editor runtime rather than a plugin-specific media implementation;
 - existing manual URL field remains as advanced/fallback behavior so alpha7 functionality is not removed;
 - media request captures the original target block; changing `this.selected` while dialog is open cannot redirect the result to another block;
 - disconnected/deleted target block ignores late result;
@@ -235,7 +240,7 @@ Pin these behaviors in the source/runtime smoke harness:
 - [ ] **Step 2: Run the contract test and verify RED**
 
 Run: `node tests/media-integration-contract-smoke.mjs`
-Expected: FAIL on missing Image/File media actions.
+Expected: FAIL on missing Image/File media actions and File block parity in the provider.
 
 - [ ] **Step 3: Implement Editor media actions**
 
@@ -248,7 +253,9 @@ Add focused methods to `XdeEditor`:
 
 Keep the existing advanced URL fields; route image URL application through the same safe media validation rules.
 
-- [ ] **Step 4: Add translated UI and responsive styling**
+- [ ] **Step 4: Bring File block and translations to provider parity**
+
+Add `file` to the plugin's translated label map and block list so embedded Joomla Editor instances expose the same File workflow as the administrator workbench. Do not add Gallery integration in alpha8.
 
 Add matching `en-GB` / `it-IT` keys for select/replace/remove image/file, selected media, unavailable/invalid selection. Use `Joomla.Text._(...)` in JS. Add compact action rows/preview/path styles with existing Core/local tokens; no light-only hardcoded surfaces; mobile actions wrap instead of horizontal overflow.
 
