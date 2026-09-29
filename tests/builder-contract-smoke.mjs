@@ -41,9 +41,17 @@ assert.match(engine, /maxColumns:\s*4\b/, 'builder engine default maxColumns mus
 assert.ok(engine.includes('data-xde-builder-width'), 'builder engine must expose the width data attribute');
 assert.ok(engine.includes('--xde-builder-width'), 'builder engine must expose the width CSS variable');
 assert.ok(engine.includes("xdecaro:builder:"), 'builder events must use the xdecaro:builder namespace');
+assert.ok(
+  engine.includes('delete this.root.__xdecaroBuilderEngine;'),
+  'builder destroy must clear its root mount reference so the same root can be mounted again'
+);
 
 assert.match(intents, /pointerdown|PointerEvent/, 'intent controller must use Pointer Events');
 assert.ok(intents.includes('destroy('), 'intent controller must expose destroy cleanup');
+assert.ok(
+  intents.includes('delete this.root.__xdecaroBuilderIntentController;'),
+  'intent controller destroy must clear its root mount reference so the same root can be mounted again'
+);
 
 for (const forbidden of [
   'com_decaroforms',
