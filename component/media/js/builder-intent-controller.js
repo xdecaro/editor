@@ -55,6 +55,7 @@
       document.removeEventListener('pointercancel', this.onPointerCancel);
       this.root.removeAttribute('data-xde-builder-intents-ready');
       this.cancel();
+      delete this.root.__xdecaroBuilderIntentController;
       this.destroyed = true;
     }
 

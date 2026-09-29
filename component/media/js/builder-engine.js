@@ -105,6 +105,7 @@
       document.removeEventListener('keydown', this.onKeyDown);
       this.root.removeAttribute('data-xde-builder-ready');
       this.clearDropState();
+      delete this.root.__xdecaroBuilderEngine;
       this.destroyed = true;
     }
 
