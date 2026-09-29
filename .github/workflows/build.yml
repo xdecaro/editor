@@ -34,6 +34,7 @@ jobs:
         run: |
           find component/media/js plugin/media/js -type f -name '*.js' -print0 2>/dev/null | xargs -0 -r -n1 node --check
           node tests/builder-contract-smoke.mjs
+          node tests/builder-lifecycle-smoke.mjs
           python3 - <<'PY'
           from pathlib import Path
           source = Path('component/media/js/field-bridge.js').read_text()
