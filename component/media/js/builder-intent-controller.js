@@ -240,7 +240,9 @@
       const pointer = this.pointer;
       pointer?.item?.classList.remove('is-xde-intent-source');
       this.root.classList.remove('is-xde-intent-dragging');
-      this.emit('dragend', {fieldKey: pointer?.fieldKey || '', intent: this.intent});
+      if (pointer) {
+        this.emit('dragend', {fieldKey: pointer.fieldKey || '', intent: this.intent});
+      }
       this.pointer = null;
       this.intent = null;
       window.clearTimeout(this.holdTimer);
